@@ -54,8 +54,14 @@ You can now run `python -m recommender.gen_recommend` followed by `python -m rec
 
 1. Install Node 20 (https://nodejs.org/en/download/).
 2. `cd webapp`
-3. `npm i`
-4. `npm run dev`
+2. Build the customized sql.js with emscripten
+   1. install Docker if you don't already have it
+   2. `cd webapp`
+   3. `docker build -t sqljs-builder -f sqljs-builder.Dockerfile .`
+   4. `docker run --rm -it -v "$(pwd)/vendor/sql.js:/src" sqljs-builder npm run build`
+4. now, back in the `webapp` directory
+5. `npm i`
+6. `npm run dev`
 
 ## Deploy webapp to gh-pages
 
