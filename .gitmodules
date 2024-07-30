@@ -1,0 +1,7 @@
+[submodule "webapp/vendor/sql.js"]
+	path = webapp/vendor/sql.js
+	url = git@github.com:cxcorp/sql.js.git
+[submodule "recommender/data/scp-api"]
+	path = recommender/data/scp-api
+	url = git@github.com:scp-data/scp-api.git
+	shallow = true
