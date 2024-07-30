@@ -73,6 +73,7 @@ const StyledFixedSizeList = styled(FixedSizeList)`
 
 const StyledSidebar = styled.aside`
   width: 300px;
+  flex: 2 0 300px;
 
   @media only screen and (max-width: 576px) {
     width: 100%;
@@ -84,6 +85,7 @@ const StyledSidebar = styled.aside`
 
 const StyledApp = styled.div`
   display: flex;
+  flex-wrap: wrap;
 
   @media only screen and (max-width: 576px) {
     flex-direction: column;
@@ -425,14 +427,11 @@ const HubInfoList = ({
 
 const ResultColumnsWrapper = styled.div`
   display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-  @media only screen and (min-width: 577px) {
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    & > div {
-      padding: 0 10px;
-    }
+  & > div {
+    padding: 0 10px;
   }
 
   @media only screen and (max-width: 576px) {
@@ -440,6 +439,10 @@ const ResultColumnsWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: stretch;
+
+    & > div {
+      padding: 0;
+    }
   }
 `;
 
@@ -447,7 +450,7 @@ const paramHolders = (count: number) => Array(count).fill("?").join(", ");
 
 const StyledResult = styled.div`
   padding: 0 50px;
-  width: 100%;
+  flex: 10 0 auto;
 
   @media only screen and (max-width: 576px) {
     padding: 0 5px;
@@ -455,6 +458,9 @@ const StyledResult = styled.div`
 
   & td {
     white-space: nowrap;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
   }
 `;
 
