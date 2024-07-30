@@ -1063,7 +1063,7 @@ Error generating stack: `+o.message+`
 0.50664,0.02354,0.00863
 0.49321,0.01963,0.00955
 0.4796,0.01583,0.01055`,o0=e=>e.split(`
-`).slice(1).map(n=>n.trim()).filter(n=>!!n).map(n=>{const t=n.split(/,\s*/),[r,l,o]=t.map(u=>parseFloat(u));return[r,l,o]}),g9=new Map([["magma",o0(p9)],["viridis",o0(h9)],["plasma",o0(m9)],["turbo",o0(v9)]]);class y9{constructor(n,t){ru(this,"mapping");const r=g9.get(n);if(!r)throw new Error(`Unrecognized mapping "${n}"`);this.mapping=[...r],t&&this.mapping.reverse()}color(n,t,r){const l=S9(j1(n,t,r,0,255),0,255),o=Math.floor(l),i=Math.ceil(l);if(o===i)return $1(this.mapping[o]);const u=this.mapping[o],s=this.mapping[i];return $1(w9(u,s,j1(l,o,i,0,1)))}}function $1(e){const[n,t,r]=e.map(l=>l*255);return`rgb(${n}, ${t}, ${r})`}function S9(e,n,t){return Math.max(n,Math.min(t,e))}function j1(e,n,t,r,l){return r+(e-n)*(l-r)/(t-n)}function w9(e,n,t){return[e[0]+(n[0]-e[0])*t,e[1]+(n[1]-e[1])*t,e[2]+(n[2]-e[2])*t]}const k9="modulepreload",x9=function(e){return"/scp-wiki-semantic-similarity-search/"+e},D1={},M1=function(n,t,r){let l=Promise.resolve();if(t&&t.length>0){document.getElementsByTagName("link");const o=document.querySelector("meta[property=csp-nonce]"),i=(o==null?void 0:o.nonce)||(o==null?void 0:o.getAttribute("nonce"));l=Promise.all(t.map(u=>{if(u=x9(u),u in D1)return;D1[u]=!0;const s=u.endsWith(".css"),f=s?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${u}"]${f}`))return;const h=document.createElement("link");if(h.rel=s?"stylesheet":k9,s||(h.as="script",h.crossOrigin=""),h.href=u,i&&h.setAttribute("nonce",i),document.head.appendChild(h),s)return new Promise((v,m)=>{h.addEventListener("load",v),h.addEventListener("error",()=>m(new Error(`Unable to preload CSS for ${u}`)))})}))}return l.then(()=>n()).catch(o=>{const i=new Event("vite:preloadError",{cancelable:!0});if(i.payload=o,window.dispatchEvent(i),!i.defaultPrevented)throw o})},E9="/scp-wiki-semantic-similarity-search/assets/sql-wasm-Bku9E_kW.wasm",C9=()=>{try{if(typeof WebAssembly=="object"&&typeof WebAssembly.instantiate=="function"){const e=new WebAssembly.Module(Uint8Array.of(0,97,115,109,1,0,0,0));if(e instanceof WebAssembly.Module)return new WebAssembly.Instance(e)instanceof WebAssembly.Instance}}catch{}return!1},_9=async()=>C9()?(await M1(()=>import("./sql-wasm-D_rsaqy9.js"),[]).then(n=>n.default))({locateFile:n=>{if(n!=="sql-wasm.wasm")throw new Error(`Unexpected path "${n}" in initSqlJs->locateFile`);return E9}}):(await M1(()=>import("./sql-asm-CB-bv5ax.js"),[]).then(n=>n.default))();async function P9(e){const n=await _9(),t=await fetch(e).then(l=>l.arrayBuffer()).then(l=>new Uint8Array(l));return new n.Database(t)}const N9=c5,kc=Fe.li`
+`).slice(1).map(n=>n.trim()).filter(n=>!!n).map(n=>{const t=n.split(/,\s*/),[r,l,o]=t.map(u=>parseFloat(u));return[r,l,o]}),g9=new Map([["magma",o0(p9)],["viridis",o0(h9)],["plasma",o0(m9)],["turbo",o0(v9)]]);class y9{constructor(n,t){ru(this,"mapping");const r=g9.get(n);if(!r)throw new Error(`Unrecognized mapping "${n}"`);this.mapping=[...r],t&&this.mapping.reverse()}color(n,t,r){const l=S9(j1(n,t,r,0,255),0,255),o=Math.floor(l),i=Math.ceil(l);if(o===i)return $1(this.mapping[o]);const u=this.mapping[o],s=this.mapping[i];return $1(w9(u,s,j1(l,o,i,0,1)))}}function $1(e){const[n,t,r]=e.map(l=>l*255);return`rgb(${n}, ${t}, ${r})`}function S9(e,n,t){return Math.max(n,Math.min(t,e))}function j1(e,n,t,r,l){return r+(e-n)*(l-r)/(t-n)}function w9(e,n,t){return[e[0]+(n[0]-e[0])*t,e[1]+(n[1]-e[1])*t,e[2]+(n[2]-e[2])*t]}const k9="modulepreload",x9=function(e){return"/scp-wiki-semantic-similarity-search/"+e},D1={},M1=function(n,t,r){let l=Promise.resolve();if(t&&t.length>0){document.getElementsByTagName("link");const o=document.querySelector("meta[property=csp-nonce]"),i=(o==null?void 0:o.nonce)||(o==null?void 0:o.getAttribute("nonce"));l=Promise.all(t.map(u=>{if(u=x9(u),u in D1)return;D1[u]=!0;const s=u.endsWith(".css"),f=s?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${u}"]${f}`))return;const h=document.createElement("link");if(h.rel=s?"stylesheet":k9,s||(h.as="script",h.crossOrigin=""),h.href=u,i&&h.setAttribute("nonce",i),document.head.appendChild(h),s)return new Promise((v,m)=>{h.addEventListener("load",v),h.addEventListener("error",()=>m(new Error(`Unable to preload CSS for ${u}`)))})}))}return l.then(()=>n()).catch(o=>{const i=new Event("vite:preloadError",{cancelable:!0});if(i.payload=o,window.dispatchEvent(i),!i.defaultPrevented)throw o})},E9="/scp-wiki-semantic-similarity-search/assets/sql-wasm-Bku9E_kW.wasm",C9=()=>{try{if(typeof WebAssembly=="object"&&typeof WebAssembly.instantiate=="function"){const e=new WebAssembly.Module(Uint8Array.of(0,97,115,109,1,0,0,0));if(e instanceof WebAssembly.Module)return new WebAssembly.Instance(e)instanceof WebAssembly.Instance}}catch{}return!1},_9=async()=>C9()?(await M1(()=>import("./sql-wasm-CISZRuJp.js"),[]).then(n=>n.default))({locateFile:n=>{if(n!=="sql-wasm.wasm")throw new Error(`Unexpected path "${n}" in initSqlJs->locateFile`);return E9}}):(await M1(()=>import("./sql-asm-juQsG6Ve.js"),[]).then(n=>n.default))();async function P9(e){const n=await _9(),t=await fetch(e).then(l=>l.arrayBuffer()).then(l=>new Uint8Array(l));return new n.Database(t)}const N9=c5,kc=Fe.li`
   margin: 0;
   line-height: 40px;
   vertical-align: middle;
@@ -1091,6 +1091,7 @@ Error generating stack: `+o.message+`
   }
 `,O9=Fe.aside`
   width: 300px;
+  flex: 2 0 300px;
 
   @media only screen and (max-width: 576px) {
     width: 100%;
@@ -1100,6 +1101,7 @@ Error generating stack: `+o.message+`
   }
 `,R9=Fe.div`
   display: flex;
+  flex-wrap: wrap;
 
   @media only screen and (max-width: 576px) {
     flex-direction: column;
@@ -1128,14 +1130,11 @@ Error generating stack: `+o.message+`
   }
 `,bl=Object.create(null),U9=e=>{const n=bl[e]??(bl[e]=0);return bl[e]++,t=>{console.log(`[${e} ${n}] ${t}`)}},W9=()=>{const[e,n]=U.useState();return U.useEffect(()=>{const t=U9("usePageHubsDb");let r=!1,l;return(async()=>{const i=`${ri}/hubs.sqlite`;if(t("begin init"),l=await P9(i),r){t("initSqliteDb finish but is unmounted -> close"),l.close();return}t("initSqliteDb finish, setDb()"),n(()=>l)})(),()=>{t("initSqliteDb unmount hook, closing"),r=!0,n(()=>{}),l==null||l.close()}},[]),{db:e}},B9=({hubInfo:e,items:n})=>{const[t,r]=U.useState(!1),l=Sl(u=>u.setSelectedLink),o=Object.entries(e.hubToPages),i=o.length!==o.filter(([,u])=>u.length>1).length;return I.jsxs("div",{children:[I.jsx("table",{children:I.jsx("tbody",{children:o.sort(([,u],[,s])=>s.length-u.length).filter(([,u])=>t?u:u.length>1).flatMap(([u,s])=>{const f=s.map(h=>n.find(m=>m.link===h)).filter(h=>!!h).sort((h,v)=>v.similarity-h.similarity);return[I.jsx("tr",{children:I.jsx("th",{colSpan:4,style:{textAlign:"left",fontWeight:"normal",borderBottom:"1px solid grey"},children:u})},`hub:${u}`),...f.map(({link:h,similarity:v})=>I.jsxs("tr",{children:[I.jsx("td",{style:{padding:"0 5px"},children:I.jsx(Cc,{onClick:()=>{l(h)},children:"Search"})}),I.jsx("td",{style:{padding:"0 5px"},children:I.jsx(Ec,{href:`https://scp-wiki.wikidot.com/${encodeURI(h)}`,target:"_blank",rel:"noopener noreferrer",children:"Wiki 🡥"})}),I.jsx("td",{style:{backgroundColor:xc.color(v,0,1),color:"#000"},children:v.toFixed(3)}),I.jsx("td",{style:{paddingLeft:"10px"},children:h})]},`hub:${u}-page:${h}`)),I.jsx("tr",{style:{height:"10px"}},`padding:${u}`)]})})}),i&&I.jsxs("label",{style:{paddingTop:"1rem",display:"block"},children:[I.jsx("input",{type:"checkbox",checked:t,onChange:u=>{const s=u.currentTarget.checked;r(()=>s)}})," ","Show more"]})]})},H9=Fe.div`
   display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-  @media only screen and (min-width: 577px) {
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    & > div {
-      padding: 0 10px;
-    }
+  & > div {
+    padding: 0 10px;
   }
 
   @media only screen and (max-width: 576px) {
@@ -1143,10 +1142,14 @@ Error generating stack: `+o.message+`
     flex-direction: column;
     align-items: center;
     justify-content: stretch;
+
+    & > div {
+      padding: 0;
+    }
   }
 `,V9=e=>Array(e).fill("?").join(", "),Q9=Fe.div`
   padding: 0 50px;
-  width: 100%;
+  flex: 10 0 auto;
 
   @media only screen and (max-width: 576px) {
     padding: 0 5px;
@@ -1154,6 +1157,9 @@ Error generating stack: `+o.message+`
 
   & td {
     white-space: nowrap;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
   }
 `;function K9({selectedLink:e,items:n}){const{db:t}=W9(),[r,l]=U.useState();return U.useEffect(()=>{const i=(()=>{if(!t||!t.db||!e){console.log("no db, db closed, or no selected link");return}const[u]=t.exec(`
           SELECT page_link, hub_link
