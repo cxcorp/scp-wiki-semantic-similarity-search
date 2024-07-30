@@ -1,0 +1,3 @@
+[submodule "vendor/sql.js"]
+	path = vendor/sql.js
+	url = git@github.com:cxcorp/sql.js.git
