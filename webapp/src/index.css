@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
 
   --color-text-rgb: 240 250 255;
   --color-text: rgba(var(--color-text-rgb) / 0.87);
@@ -20,14 +20,6 @@
 
   --font-family-inter-tight: "Inter Tight", "Inter", system-ui, Avenir,
     Helvetica, Arial, sans-serif;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-text: #213547;
-    --color-subtitle: #213547;
-    --color-background: #ffffff;
-  }
 }
 
 * {
