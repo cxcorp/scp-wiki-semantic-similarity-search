@@ -8,7 +8,7 @@ const isWasmSupported = () => {
       typeof WebAssembly.instantiate === "function"
     ) {
       const module = new WebAssembly.Module(
-        Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00)
+        Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00),
       );
       if (module instanceof WebAssembly.Module)
         return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
@@ -22,7 +22,7 @@ const isWasmSupported = () => {
 const initSqlJs = async () => {
   if (isWasmSupported()) {
     const initSqlJs = await import("sql.js/dist/sql-wasm.mjs").then(
-      (m) => m.default
+      (m) => m.default,
     );
     return initSqlJs({
       locateFile: (path: string) => {
@@ -35,7 +35,7 @@ const initSqlJs = async () => {
     });
   } else {
     const initSqlJs = await import("sql.js/dist/sql-asm.mjs").then(
-      (m) => m.default
+      (m) => m.default,
     );
     return initSqlJs();
   }

@@ -7,12 +7,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prettier": "prettier --write src"
   },
   "dependencies": {
     "normalize.css": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-select": "^5.8.0",
     "react-window": "^1.8.10",
     "sql.js": "file:./vendor/sql.js",
     "styled-components": "^6.1.12"
@@ -30,7 +32,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
-    "prettier": "3.3.3",
+    "prettier": "^3.3.3",
     "typescript": "^5.2.2",
     "vite": "^5.3.4"
   }

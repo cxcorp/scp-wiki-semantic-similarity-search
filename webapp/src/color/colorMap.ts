@@ -55,7 +55,7 @@ export class ColorMap {
     const from = this.mapping[floored];
     const to = this.mapping[ceiled];
     return toCssRgb(
-      lerpColors(from, to, mapLinear(uint8Value, floored, ceiled, 0, 1))
+      lerpColors(from, to, mapLinear(uint8Value, floored, ceiled, 0, 1)),
     );
   }
 }
@@ -75,7 +75,7 @@ function mapLinear(
   a1: number,
   a2: number,
   b1: number,
-  b2: number
+  b2: number,
 ): number {
   return b1 + ((x - a1) * (b2 - b1)) / (a2 - a1);
 }
