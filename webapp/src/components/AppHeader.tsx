@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
+import { bp } from "../common/breakpoints";
 import { mainContainer } from "../common/ui-constants";
 import SearchBar from "./SearchBar";
-import { bp } from "../common/breakpoints";
 
 const Header = styled.header`
   ${mainContainer}

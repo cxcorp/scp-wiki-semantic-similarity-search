@@ -1,7 +1,7 @@
 import magmaCsv from "./magma.csv?raw";
-import viridisCsv from "./viridis.csv?raw";
 import plasmaCsv from "./plasma.csv?raw";
 import turboCsv from "./turbo.csv?raw";
+import viridisCsv from "./viridis.csv?raw";
 
 type ColorMapVariant = "magma" | "viridis" | "plasma" | "turbo";
 export type Color = [r: number, g: number, b: number];
