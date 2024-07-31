@@ -7,25 +7,8 @@ import {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { styled } from "styled-components";
-import { useAppContext } from "../context/AppContext";
-
-const SearchIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="11" cy="11" r="8"></circle>
-    <path d="m21 21-4.3-4.3"></path>
-  </svg>
-);
+import { useAppContext } from "../context/useAppContext";
+import SearchIcon from "./SearchIcon";
 
 const SearchBarIcon = styled(SearchIcon)`
   flex: 0 0 auto;
@@ -219,7 +202,7 @@ const StyledAsyncSelect = styled(AsyncSelect<SearchOption>)`
   }
 `;
 
-const SearchBar = () => {
+const SearchBar = ({ className }: { className?: string }) => {
   const setSelectedLink = useAppContext((s) => s.setSelectedLink);
   const { searchCorpus } = useItemSearch();
 
@@ -242,6 +225,7 @@ const SearchBar = () => {
   return (
     <StyledAsyncSelect
       ref={selectRef}
+      className={className}
       classNamePrefix="react-select"
       noOptionsMessage={useNoOptionsMessage(selectRef)}
       components={SelectComponents}

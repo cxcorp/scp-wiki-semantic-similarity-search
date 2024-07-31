@@ -10,7 +10,7 @@
   --color-subtitle: rgba(var(--color-text-rgb) / 0.55);
   color: var(--color-text);
 
-  --color-background: #1b1b1b;
+  --color-background: #1b1c20;
   background-color: var(--color-background);
 
   font-synthesis: none;
@@ -20,6 +20,16 @@
 
   --font-family-inter-tight: "Inter Tight", "Inter", system-ui, Avenir,
     Helvetica, Arial, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 64px;
 }
 
 * {
@@ -28,11 +38,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #2684ff;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #2684ff;
 }
 
 html,

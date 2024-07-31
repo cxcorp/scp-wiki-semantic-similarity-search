@@ -10,7 +10,7 @@ import {
   FixedSizeListProps,
 } from "react-window";
 import { CSSProperties, styled } from "styled-components";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/useAppContext";
 
 const FixedSizeList = _FixedSizeList as ComponentType<FixedSizeListProps>;
 
