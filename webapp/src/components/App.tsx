@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 import { mainContainer } from "../common/ui-constants";
 import AppContextProvider from "./AppContextProvider";
 import AppHeader from "./AppHeader";
-import Results from "./Results";
+import Results from "./results/Results";
 
 const StyledApp = styled.div`
   display: flex;

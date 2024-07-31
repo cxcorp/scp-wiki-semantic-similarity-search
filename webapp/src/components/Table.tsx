@@ -55,7 +55,8 @@ export const Table = styled.table`
 `;
 
 const ScrollWrapper = styled.div`
-  max-height: 300px;
+  max-height: calc(min(70vh, 600px));
+  max-height: calc(min(70svh, 600px));
   overflow-y: scroll;
   position: relative;
 `;
