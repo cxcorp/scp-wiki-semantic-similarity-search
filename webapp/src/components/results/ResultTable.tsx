@@ -1,6 +1,6 @@
 import { CSSProperties, useLayoutEffect } from "react";
 import { SimilarityItem } from "../../services/similarity";
-import { Table, TableForScrollHeader, useTableScrollWrapper } from "../Table";
+import { Table, useTableScrollWrapper } from "../Table";
 import { ExternalLink } from "./ExternalLink";
 import {
   ActionsColumnCell,
@@ -27,11 +27,7 @@ export const ResultTable = ({ items, onItemShowClicked }: ResultTableProps) => {
 
   return (
     <TableScrollWrapper {...tableScrollWrapperProps}>
-      <TableForScrollHeader>
-        {/* We have basically fixed size columns so we can just make this a separate
-         * table and position:sticky it. If we had more than 2 columns, we'd have to
-         * do something else because the column sizes need to be calculated from
-         * the content. */}
+      <Table>
         <thead>
           <tr>
             <SimilarityColumnCell as="th">Similarity</SimilarityColumnCell>
@@ -39,9 +35,6 @@ export const ResultTable = ({ items, onItemShowClicked }: ResultTableProps) => {
             <ActionsColumnCell as="th"></ActionsColumnCell>
           </tr>
         </thead>
-      </TableForScrollHeader>
-
-      <Table>
         <tbody>
           {items.map((item) => {
             const { link, similarity } = item;
