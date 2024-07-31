@@ -156,7 +156,8 @@ const StyledAsyncSelect = styled(AsyncSelect<SearchOption>)`
     border-color: #2684ff;
   }
 
-  .react-select__control:hover .react-select__indicator-separator {
+  .react-select__control:hover:not(.react-select__control--is-focused)
+    .react-select__indicator-separator {
     background-color: #b3b3b3;
   }
 
