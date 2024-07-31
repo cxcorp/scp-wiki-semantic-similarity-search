@@ -4,11 +4,8 @@ import { basePath } from "../../common/ui-constants";
 import { useAppContext } from "../../context/useAppContext";
 import { SimilarityItem } from "../../services/similarity";
 import { initSqliteDb } from "../../sqlite";
-import {
-  colorMap,
-  ResultSearchButton,
-  ResultWikiLink,
-} from "./ResultsComponents";
+import { ExternalLink } from "./ExternalLink";
+import { colorMap, ResultSearchButton } from "./ResultsComponents";
 
 const loggerToCount: Record<string, number> = Object.create(null);
 const logger = (prefix: string) => {
@@ -123,13 +120,13 @@ const HubInfoList = ({
                       </ResultSearchButton>
                     </td>
                     <td style={{ padding: "0 5px" }}>
-                      <ResultWikiLink
+                      <ExternalLink
                         href={`https://scp-wiki.wikidot.com/${encodeURI(link)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Wiki 🡥
-                      </ResultWikiLink>
+                        Wiki
+                      </ExternalLink>
                     </td>
                     <td
                       style={{

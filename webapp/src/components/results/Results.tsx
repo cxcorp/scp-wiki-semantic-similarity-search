@@ -1,22 +1,12 @@
-import { CSSProperties, useLayoutEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { styled } from "styled-components";
 import { mainContainer } from "../../common/ui-constants";
 import { useAppContext } from "../../context/useAppContext";
 import { extractSimilarityData } from "../../services/similarity";
-import { Table, TableForScrollHeader, useTableScrollWrapper } from "../Table";
+import { ExternalLink } from "./ExternalLink";
 import { HubResult } from "./HubsTable";
-import {
-  ActionsColumnCell,
-  colorMap,
-  PageColumnCell,
-  ResultSearchButton,
-  ResultSearchIcon,
-  ResultWikiLink,
-  ResultWikiLinkText,
-  SimilarityColumnCell,
-  SimilarityValue,
-  TextLink,
-} from "./ResultsComponents";
+import { TextLink } from "./ResultsComponents";
+import { ResultTable } from "./ResultTable";
 
 const ResultWrapper = styled.div`
   display: flex;
@@ -24,6 +14,7 @@ const ResultWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   background: #24262b;
+  padding-bottom: var(--space-8);
 `;
 
 const ResultContainer = styled.div`
@@ -39,27 +30,20 @@ function Results() {
     return items;
   }, [buf, corpus, selectedLink]);
 
-  const { TableScrollWrapper, resetScrollPosition, tableScrollWrapperProps } =
-    useTableScrollWrapper();
-
-  useLayoutEffect(() => {
-    resetScrollPosition();
-  }, [resetScrollPosition, selectedLink]);
-
   return (
     <ResultWrapper>
       <ResultContainer>
         <h2>
           Pages similar to{" "}
-          <ResultWikiLink
-            $underline
+          <ExternalLink
+            underline
             href={`https://scp-wiki.wikidot.com/${encodeURI(selectedLink)}`}
             title={`https://scp-wiki.wikidot.com/${encodeURI(selectedLink)}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ResultWikiLinkText>{selectedLink}</ResultWikiLinkText>
-          </ResultWikiLink>
+            {selectedLink}
+          </ExternalLink>
         </h2>
         {/* <p>Page: {selectedLink}</p> */}
         <p>
@@ -74,69 +58,7 @@ function Results() {
           the content is.
         </p>
 
-        <TableScrollWrapper {...tableScrollWrapperProps}>
-          <TableForScrollHeader>
-            {/* We have basically fixed size columns so we can just make this a separate
-             * table and position:sticky it. If we had more than 2 columns, we'd have to
-             * do something else because the column sizes need to be calculated from
-             * the content. */}
-            <thead>
-              <tr>
-                <SimilarityColumnCell as="th">Similarity</SimilarityColumnCell>
-                <th>Page</th>
-                <ActionsColumnCell as="th"></ActionsColumnCell>
-              </tr>
-            </thead>
-          </TableForScrollHeader>
-
-          <Table>
-            <tbody>
-              {items.map(({ link, similarity }) => {
-                return (
-                  <tr key={link}>
-                    <SimilarityColumnCell>
-                      <SimilarityValue
-                        style={
-                          {
-                            "--similarity-color": colorMap.color(
-                              similarity,
-                              0,
-                              1,
-                            ),
-                          } as CSSProperties
-                        }
-                      >
-                        {(similarity * 100).toFixed(2)}
-                      </SimilarityValue>
-                    </SimilarityColumnCell>
-                    <PageColumnCell>
-                      <ResultWikiLink
-                        href={`https://scp-wiki.wikidot.com/${encodeURI(link)}`}
-                        title={`https://scp-wiki.wikidot.com/${encodeURI(link)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ResultWikiLinkText>{link}</ResultWikiLinkText>
-                      </ResultWikiLink>
-                    </PageColumnCell>
-                    <ActionsColumnCell>
-                      <ResultSearchButton
-                        onClick={() => {
-                          setSelectedLink(link);
-                        }}
-                        title={`Show recommendations for ${link}`}
-                      >
-                        <ResultSearchIcon />
-                        <span style={{ fontSize: "12px" }}>Show</span>
-                      </ResultSearchButton>
-                    </ActionsColumnCell>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        </TableScrollWrapper>
-
+        <ResultTable items={items} onItemShowClicked={setSelectedLink} />
         <HubResult selectedLink={selectedLink} items={items} />
       </ResultContainer>
     </ResultWrapper>

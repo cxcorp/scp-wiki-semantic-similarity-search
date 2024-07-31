@@ -5,33 +5,6 @@ import SearchIcon from "../SearchIcon";
 
 export const colorMap = new ColorMap("viridis");
 
-export const ResultWikiLinkText = styled.span``;
-
-export const ResultWikiLink = styled.a<{ $underline?: boolean }>`
-  color: inherit;
-  text-decoration: none;
-
-  &:visited {
-    color: #646cff;
-  }
-
-  ${ResultWikiLinkText} {
-    text-decoration: ${({ $underline }) => ($underline ? "underline" : "none")};
-  }
-
-  &:hover ${ResultWikiLinkText} {
-    text-decoration: underline;
-  }
-
-  &::after {
-    content: "🡥";
-    font-family: sans-serif;
-    display: inline;
-    margin-left: 4px;
-    text-decoration: none;
-  }
-`;
-
 export const SimilarityValue = styled.span`
   &::before {
     content: "";
