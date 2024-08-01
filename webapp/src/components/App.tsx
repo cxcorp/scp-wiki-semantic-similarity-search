@@ -18,31 +18,11 @@ const Footer = styled.footer`
   align-items: center;
   background: #090a0f;
   color: var(--color-body-text);
-  padding-bottom: var(--space-7);
-
-  ul {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-  }
-
-  ul.nav {
-    ${mainContainer}
-    display: flex;
-    gap: 25px;
-    margin: 0 auto;
-    padding: 0 10px;
-    list-style-type: none;
-  }
-
-  ul.nav li {
-    height: 48px;
-    line-height: 48px;
-  }
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-5);
 `;
 
 const TextLink = styled.a`
-  color: inherit;
   color: var(--color-text);
   text-decoration: none;
 
@@ -51,19 +31,24 @@ const TextLink = styled.a`
   }
 `;
 
-const AttributionContainer = styled.div`
+const Container = styled.div`
   ${mainContainer}
+`;
 
+const AttributionContainer = styled.div`
+  margin-top: var(--space-6);
   font-size: 14px;
 `;
 
 const Paragraph = styled.p`
   margin: 0;
-  margin-bottom: var(--space-2);
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-1);
 `;
 
 const AttributionHeader = styled(Paragraph)`
   font-weight: 600;
+  margin-top: var(--space-3);
 `;
 
 function App() {
@@ -75,37 +60,50 @@ function App() {
         <Results />
 
         <Footer>
-          <ul className="nav">
-            {/* <li>
-              <TextLink href={basePath}>Home</TextLink>
-            </li> */}
-            {/* <li>About</li> */}
-            <li style={{ marginLeft: "auto" }}>
-              <ExternalLink href="https://github.com/cxcorp/scp-wiki-semantic-similarity-search">
-                Source code on GitHub
-              </ExternalLink>
-            </li>
-          </ul>
-          <AttributionContainer>
-            <AttributionHeader>License and attribution</AttributionHeader>
-            <Paragraph>
-              Content relating to the SCP Foundation, including the SCP
-              Foundation logo, is licensed under Creative Commons Sharealike 3.0
-              and all concepts originate from{" "}
-              <TextLink href="https://scpwiki.com/" rel="noopener">
-                https://scpwiki.com/
-              </TextLink>{" "}
-              and its authors. Such content redistributed on this website is
-              hereby also released under Creative Commons Sharealike 3.0.
-            </Paragraph>
-            <Paragraph>
-              SCP Wiki crawl dataset via the{" "}
-              <ExternalLink href="https://github.com/scp-data/scp-api/">
-                scp-api
-              </ExternalLink>{" "}
-              project.
-            </Paragraph>
-          </AttributionContainer>
+          <Container>
+            <ExternalLink href="https://github.com/cxcorp/scp-wiki-semantic-similarity-search">
+              Source code and license details on GitHub
+            </ExternalLink>
+            <AttributionContainer>
+              <AttributionHeader>Legal</AttributionHeader>
+              <Paragraph>
+                <ExternalLink href="https://github.com/cxcorp/scp-wiki-semantic-similarity-search">
+                  License and attribution details
+                </ExternalLink>
+              </Paragraph>
+              <Paragraph>
+                Content relating to the SCP Foundation, including the SCP
+                Foundation logo, is licensed under{" "}
+                <TextLink
+                  href="https://creativecommons.org/licenses/by-sa/3.0/"
+                  rel="noopener"
+                >
+                  Creative Commons Attribution-Sharealike 3.0
+                </TextLink>{" "}
+                and all concepts originate from{" "}
+                <TextLink href="https://scpwiki.com/" rel="noopener">
+                  https://scpwiki.com/
+                </TextLink>{" "}
+                and its authors. The displayed content, originating from the
+                data files "corpus.txt", "hubs.sqlite" and "matches.bin", is
+                content relating to or derived from content relating to the SCP
+                Foundation, and is hereby also released under Creative Commons
+                Attribution-Sharealike 3.0 (CC BY-SA 3.0).
+              </Paragraph>
+
+              <AttributionHeader>Data source</AttributionHeader>
+              <Paragraph>
+                SCP Wiki crawl dataset via the{" "}
+                <TextLink
+                  href="https://github.com/scp-data/scp-api/"
+                  rel="noopener"
+                >
+                  scp-api
+                </TextLink>{" "}
+                project.
+              </Paragraph>
+            </AttributionContainer>{" "}
+          </Container>
         </Footer>
       </StyledApp>
     </AppContextProvider>
