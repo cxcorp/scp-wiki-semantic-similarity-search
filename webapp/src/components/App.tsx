@@ -65,6 +65,10 @@ function App() {
               Source code and license details on GitHub
             </ExternalLink>
             <AttributionContainer>
+              <AttributionHeader>Disclaimer</AttributionHeader>
+              <Paragraph>
+                This website is not affiliated with the SCP Wiki.
+              </Paragraph>
               <AttributionHeader>Legal</AttributionHeader>
               <Paragraph>
                 <ExternalLink href="https://github.com/cxcorp/scp-wiki-semantic-similarity-search">
