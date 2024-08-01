@@ -2,20 +2,27 @@ import { AnchorHTMLAttributes, ReactNode } from "react";
 import styled from "styled-components";
 
 const ExternalLinkText = styled.span``;
-const ExternalLinkAnchor = styled.a<{ $underline?: boolean }>`
+const ExternalLinkAnchor = styled.a<{
+  $underline?: boolean;
+  $showVisited: boolean;
+}>`
   color: inherit;
   text-decoration: none;
 
-  &:visited {
-    color: #646cff;
+  &:hover ${ExternalLinkText} {
+    text-decoration: underline;
   }
+
+  ${({ $showVisited }) =>
+    $showVisited &&
+    `
+    &:visited {
+      color: #646cff;
+    }
+  `}
 
   ${ExternalLinkText} {
     text-decoration: ${({ $underline }) => ($underline ? "underline" : "none")};
-  }
-
-  &:hover ${ExternalLinkText} {
-    text-decoration: underline;
   }
 
   &::after {
@@ -30,14 +37,36 @@ const ExternalLinkAnchor = styled.a<{ $underline?: boolean }>`
 interface ExternalLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   children: ReactNode;
   underline?: boolean;
+  showVisited?: boolean;
 }
 
 export const ExternalLink = ({
   children,
   underline,
+  showVisited = false,
   ...props
 }: ExternalLinkProps) => (
-  <ExternalLinkAnchor {...props} $underline={underline}>
+  <ExternalLinkAnchor
+    rel="noopener"
+    {...props}
+    $underline={underline}
+    $showVisited={showVisited}
+  >
     <ExternalLinkText>{children}</ExternalLinkText>
   </ExternalLinkAnchor>
+);
+
+interface ScpWikiLinkProps extends ExternalLinkProps {
+  link: string;
+}
+
+export const ScpWikiLink = ({ children, link, ...props }: ScpWikiLinkProps) => (
+  <ExternalLink
+    href={`https://scp-wiki.wikidot.com/${encodeURI(link)}`}
+    title={`https://scp-wiki.wikidot.com/${encodeURI(link)}`}
+    target="_blank"
+    {...props}
+  >
+    {children}
+  </ExternalLink>
 );

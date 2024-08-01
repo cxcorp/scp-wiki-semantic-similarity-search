@@ -8,6 +8,7 @@
   --color-text-rgb: 240 250 255;
   --color-text: rgba(var(--color-text-rgb) / 0.87);
   --color-subtitle: rgba(var(--color-text-rgb) / 0.55);
+  --color-body-text: var(--color-subtitle);
   color: var(--color-text);
 
   --color-background: #1b1c20;
@@ -82,4 +83,8 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+p {
+  color: var(--color-body-text);
 }
