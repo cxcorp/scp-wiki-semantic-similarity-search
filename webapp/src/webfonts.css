@@ -1,51 +1,10 @@
 @font-face {
   font-family: "Inter Tight";
   font-style: normal;
-  font-weight: 400;
-  src:
-    local("Inter Tight"),
-    url("/fonts/InterTight-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Inter Tight";
-  font-style: normal;
-  font-weight: 500;
-  src:
-    local("Inter Tight"),
-    url("/fonts/InterTight-Medium.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Inter Tight";
-  font-style: normal;
   font-weight: 600;
   src:
     local("Inter Tight"),
     url("/fonts/InterTight-SemiBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Inter Tight";
-  font-style: normal;
-  font-weight: 700;
-  src:
-    local("Inter Tight"),
-    url("/fonts/InterTight-Bold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Inter Tight";
-  font-style: normal;
-  font-weight: 800;
-  src:
-    local("Inter Tight"),
-    url("/fonts/InterTight-ExtraBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Inter Tight";
-  font-style: normal;
-  font-weight: 900;
-  src:
-    local("Inter Tight"),
-    url("/fonts/InterTight-Black.ttf") format("truetype");
 }
 @font-face {
   font-family: "Inter";
