@@ -42,8 +42,6 @@ const Title = styled.h2`
   }
 `;
 
-const HubTitle = styled.h2``;
-
 const ResultContainer = styled.div`
   ${mainContainer}
 
@@ -57,9 +55,7 @@ const SectionDescription = styled.div`
   margin-bottom: var(--space-5);
 `;
 
-const StyledResultHubsTables = styled(ResultHubsTables)`
-
-`;
+const StyledResultHubsTables = styled(ResultHubsTables)``;
 
 const Results = () => {
   const { corpus, buf, selectedLink, setSelectedLink } = useAppContext();
