@@ -91,6 +91,20 @@ function App() {
                 Attribution-Sharealike 3.0 (CC BY-SA 3.0).
               </Paragraph>
 
+              <Paragraph>
+                Favicon:{" "}
+                <TextLink
+                  href="https://icons8.com/icon/100479/barcode-scanner"
+                  rel="noopener noreferrer"
+                >
+                  Barcode Scanner
+                </TextLink>{" "}
+                icon by{" "}
+                <TextLink href="https://icons8.com" rel="noopener noreferrer">
+                  Icons8
+                </TextLink>
+              </Paragraph>
+
               <AttributionHeader>Data source</AttributionHeader>
               <Paragraph>
                 SCP Wiki crawl dataset via the{" "}
