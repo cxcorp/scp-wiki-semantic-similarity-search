@@ -12,7 +12,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
       ([corpus, buf]) => {
         if (ac.signal.aborted) return;
         setData({ corpus, buf });
-        setSelectedLink(corpus[0]);
+        setSelectedLink(corpus[Math.floor(Math.random() * corpus.length)]);
       },
       (e) => {
         if (ac.signal.aborted) return;
