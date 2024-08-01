@@ -1,8 +1,8 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { AppContextType, MainData } from "../context/AppContext";
 import { fetchSimilarityData } from "../services/similarity";
-import { AppContextType, MainData } from "./AppContext";
 
-export const AppContextProvider = ({ children }: { children: ReactNode }) => {
+const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<MainData | null>(null);
   const [selectedLink, setSelectedLink] = useState<string>("");
 
@@ -39,3 +39,5 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     </AppContextType.Provider>
   );
 };
+
+export default AppContextProvider;

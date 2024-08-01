@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { mainContainer } from "../common/ui-constants";
-import AppContextProvider from "./AppContextProvider";
+import AppContextProvider from "../context/AppContextProvider";
 import AppHeader from "./AppHeader";
 import { ExternalLink } from "./results/ExternalLink";
 import Results from "./results/Results";
