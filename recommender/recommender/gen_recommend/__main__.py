@@ -1,3 +1,4 @@
+import os
 import pickle
 import shutil
 import sqlite3
@@ -5,213 +6,63 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 import time
-import os
 import re
-
 import torch
 
 from recommender.common.constants import DB_PATH
 
-target_links = [
-    "scp-6706",
-    "scp-6058",
-    "numbed-owls-feasting",
-    "scp-7775",
-    "the-death-of-dr-fern",
-    "scp-3929",
-    "the-halloween-breach",
-    "scp-2762",
-    "scp-5992",
-    "scp-1321",
-    "the-emperor-of-many-voices",
-    "tribunal",
-    "scp-1823",
-    "scp-7268",
-    "gdp2-a-little-chat",
-    "scp-1644",
-    "the-scarlet-truth",
-    "scp-6606",
-    "test-subjects",
-    "scp-3134",
-    "scp-3088",
-    "milligan-s-truck-story",
-    "demoted-to-d-class-part-2",
-    "scp-5803",
-    "scp-3047",
-    "scp-1310",
-    "scp-2460",
-    "akiva-counter-operating-instructions",
-    "until-death-do-us-part",
-    "scp-6112",
-    "scp-4270",
-    "scp-859",
-    "scp-006",
-    "scp-4961",
-    "scp-3829",
-    "scp-7171",
-    "scp-3724",
-    "scp-526",
-    "inverted-swiss-cheese",
-    "scp-5626",
-    "scp-5045",
-    "nine-tales-from-the-cativerse",
-    "scp-6435",
-    "scp-1089",
-    "scp-4636",
-    "scp-5264",
-    "scp-6557",
-    "scp-2385",
-    "the-ranger-with-the-big-iron-on-his-hip",
-    "scp-4633",
-    "scp-3489",
-    "first-lessons",
-    "friday-afternoon",
-    "scp-5575",
-    "scp-072",
-    "scp-7553",
-    "scp-7326",
-    "the-wasteland",
-    "footsteps",
-    "scp-6465",
-    "scp-5299",
-    "waffling-about",
-    "moonlighting",
-    "scp-6501",
-    "scp-4228",
-    "the-woven-man",
-    "theogenesis",
-    "scp-1865",
-    "pilgrimage",
-    "scp-7952",
-    "scp-8023",
-    "scp-7585",
-    "masayang-palaka",
-    "scp-961",
-    "heistoween",
-    "scp-6046",
-    "broadcast",
-    "matterminded",
-    "scp-7886",
-    "scp-1863",
-    "the-scent-of-the-worm",
-    "scp-4912",
-    "amor-pati-or-love-to-suffer",
-    "scp-3548",
-    "aar-1320-chacaltaya",
-    "scp-2229",
-    "scp-5762",
-    "not-yet",
-    "dorer-dances",
-    "scp-7008",
-    "scp-5284",
-    "scp-2609",
-    "scp-2346",
-    "scp-6988",
-    "scp-7639",
-    "veilfall",
-    "scp-1214",
-    "scp-6776",
-    "scp-7540",
-    "interlude-new-toys",
-    "scp-7113",
-    "scp-2638",
-    "public-static-void",
-    "scp-2763",
-    "scp-924",
-    "scp-2090",
-    "scp-1080",
-    "scp-8623",
-    "nobody-runs-site-19",
-    "scp-4641",
-    "a-transcribed-collection-of-graffiti-from-site-42",
-    "scp-7049",
-    "the-case-of-the-missing-hand",
-    "heatwave",
-    "scp-4542",
-    "da-capo-al-fine",
-    "scp-6828",
-    "scp-3957",
-    "whole",
-    "urine-over-your-head",
-    "hint-the-thing-is-173",
-    "scp-7606",
-    "scp-6248",
-    "scp-3050",
-    "disintegration",
-    "scp-7894",
-    "scp-412",
-    "scp-5025",
-    "scp-3974",
-    "scp-1675",
-    "scp-6241",
-    "contempt",
-    "scp-5729",
-    "scp-1955",
-    "scp-1335",
-    "scp-2595",
-    "a-greater-darkness",
-    "doctor-cimmerian-cookbook",
-    "old-daevite-language",
-    "scp-4600",
-    "scp-3029",
-    "scp-7689",
-    "the-place-to-find-yourself",
-    "knee-deep-in-the-keter",
-    "evolution-of-mind",
-    "scp-140",
-    "scp-116",
-    "it-wasn-t-a-vacation",
-    "outback-law",
-    "make-america-normaler",
-    "scp-6667",
-    "scp-1225",
-    "scp-058",
-    "scp-1550",
-    "and-i-feel-fine",
-    "scp-1829",
-    "scp-109",
-    "a-circus-with-paranoia",
-    "scp-1625",
-    "scp-1104",
-    "scp-1352",
-    "come-back-kid",
-    "daddy",
-    "scp-2093",
-    "khornecon",
-    "of-able",
-    "scp-1221",
-    "scp-113",
-    "chowderclef",
-    "sa-jin-photo",
-    "green-pawn",
-    "autonomy-part-ii",
-    "scp-2028",
-    "scp-107",
-    "dreams-of-the-dead-sea",
-    "prantortiz-the-vile",
-    "scp-160",
-    "main-office-iii",
-    "cryptocurrency-and-its-consequences",
-    "scp-011",
-    "lord-blackwood-and-the-land-of-the-unclean",
-    "freedom-forever",
-    "another-soul-joins-the-halkost",
-    "quiet-game",
-    "a-bearly-thought-out-plan",
-    "scp-1752",
-    "enansi-si-gnihtyreve",
-    "knowledge-is-a-deadly-friend",
-    "festival-of-arthropods",
-    "scp-1565",
-    "dissertation",
-    "osiris-wentworth-and-his-wonderful-day-at-work",
-    "rebar-nightmares",
-    "scp-118",
-]
+
+class Cacher:
+    def __init__(self, version_prefix: str, cache_path: str = "./cache"):
+        self.version_prefix = version_prefix
+        os.makedirs(cache_path, exist_ok=True)
+        self.cache_path = cache_path
+
+    def get_file_path(self, filename: str):
+        return os.path.join(self.cache_path, f"{self.version_prefix}-{filename}")
+
+    def _write_pickle(self, filename: str, data):
+        with open(self.get_file_path(filename), "wb") as fp:
+            pickle.dump(data, fp)
+
+    def write_pages(self, data: list[tuple[str, str]]):
+        self._write_pickle("pages-cache.pickle", data)
+
+    def write_embeddings(self, data: np.ndarray):
+        self._write_pickle("embeddings-cache.pickle", data)
+
+    def write_similarities(self, data: np.ndarray):
+        self._write_pickle("similarities-np-cache.pickle", data)
+
+
+class DummyCacher(Cacher):
+    def __init__(self, version_prefix: str, cache_path: str = "./cache"):
+        super(Cacher, self).__init__(version_prefix, cache_path=cache_path)
+
+    def write_pages(self, data):
+        pass
+
+    def write_embeddings(self, data):
+        pass
+
+    def write_similarities(self, data):
+        pass
+
+
+write_cache = True
+cache_path = "./cache"
+version_prefix = "v6-multilingual"
 
 
 def main():
-    version_prefix = "cache/v5"
+    cacher = (
+        Cacher(version_prefix, cache_path)
+        if write_cache
+        else DummyCacher(version_prefix, cache_path)
+    )
+
+    # with open("./target_links.txt", "r") as fp:
+    #     target_links = fp.readlines()
 
     start = time.time()
     with sqlite3.connect(DB_PATH) as con:
@@ -272,16 +123,16 @@ def main():
     # very large documents have been processed (when moving to the "smart chunks" with
     # smaller size). However, at that point the larger batch sizes have been slowed down so much
     # by the large batch size it's faster to run with a small batch size overall.
-    embeddings = model.encode(corpus, batch_size=2, show_progress_bar=True)
+    embeddings = model.encode(
+        corpus, batch_size=2, show_progress_bar=True, convert_to_numpy=True
+    )
     end = time.time()
     print(f"encode {end-start}s")
     print(embeddings.shape)
     # [14000, 768]
 
-    with open(f"./{version_prefix}-pages-cache.pickle", "wb") as fp:
-        pickle.dump(pages, fp)
-    with open(f"./{version_prefix}-embeddings-cache.pickle", "wb") as fp:
-        pickle.dump(embeddings, fp)
+    cacher.write_pages(pages)
+    cacher.write_embeddings(embeddings)
 
     # 3. Calculate the embedding similarities
     similarities = model.similarity(embeddings, embeddings)
@@ -290,8 +141,8 @@ def main():
     #         [0.6660, 1.0000, 0.1411],
     #         [0.1046, 0.1411, 1.0000]])
     t_np = similarities.numpy()  # convert to Numpy array
-    with open(f"./{version_prefix}-similarities-np-cache.pickle", "wb") as fp:
-        pickle.dump(t_np, fp)
+
+    cacher.write_similarities(t_np)
     # with open(f"./{version}-similarities-np-cache.pickle", "rb") as fp:
     #     t_np = pickle.load(fp)
 
@@ -321,18 +172,21 @@ def main():
         structured_array[i]["value"] = np.flip(sorted_values[i])
 
     # Step 4: Write the structured array into a binary file
-    structured_array.tofile(f"./{version_prefix}-matches.bin")
+    matches_path = cacher.get_file_path("matches.bin")
+    structured_array.tofile(matches_path)
 
     # best_50 = np.flip(np.argsort(t_np[0]))[:50]
     # df = pd.DataFrame(t_np)  # convert to a dataframe
     # df.to_csv(f"{version}-testfile.csv", index=False)  # save to file
     print("Writing corpus to file")
 
-    with open(f"{version_prefix}-corpus.txt", "w") as fp:
+    corpus_path = cacher.get_file_path("corpus.txt")
+    with open(corpus_path, "w") as fp:
         fp.write("\n".join([p[0] for p in pages]))
-    
-    shutil.copyfile(f"{version_prefix}-corpus.txt", "../webapp/public/corpus.txt")
-    shutil.copyfile(f"{version_prefix}-matches.bin", "../webapp/public/matches.bin")
+
+    shutil.copyfile(corpus_path, "../webapp/public/corpus.txt")
+    shutil.copyfile(matches_path, "../webapp/public/matches.bin")
+
 
 main()
 
