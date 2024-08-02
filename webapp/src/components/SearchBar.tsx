@@ -8,6 +8,7 @@ import {
 import AsyncSelect from "react-select/async";
 import { styled } from "styled-components";
 import { useAppContext } from "../context/useAppContext";
+import { createScpMatcher } from "../services/search";
 import SearchIcon from "./SearchIcon";
 
 const SearchBarIcon = styled(SearchIcon)`
@@ -38,31 +39,29 @@ const SelectComponents = {
 
 const useItemSearch = () => {
   const { corpus } = useAppContext();
-  const corpusOptions: SearchOption[] = useMemo(
-    () => corpus.map((item) => ({ value: item, label: item })),
-    [corpus],
-  );
 
-  const searchCorpus = useCallback(
-    async (searchTerm: string): Promise<SearchOption[]> => {
-      const trimmedFilter = searchTerm.trim();
-      if (trimmedFilter.length < 3) {
-        return [];
-      }
+  return useMemo(() => {
+    const corpusOptions = corpus.map<SearchOption>((item) => ({
+      value: item,
+      label: item,
+    }));
+    const matcher = createScpMatcher(corpus, { topNPerMethod: 5 });
 
-      const shownList = corpusOptions.filter(({ label }) =>
-        label.includes(trimmedFilter),
-      );
-      return shownList
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .slice(0, 20);
-    },
-    [corpusOptions],
-  );
+    // this is async without need for a purpose - so that it works with react-select's fetcher thing
+    return {
+      searchCorpus: async (searchTerm: string): Promise<SearchOption[]> => {
+        searchTerm = searchTerm.trim().toLowerCase();
 
-  return {
-    searchCorpus,
-  };
+        if (searchTerm.length === 0) {
+          return [];
+        }
+
+        return matcher
+          .matchAll(searchTerm)
+          .map(({ index }) => corpusOptions[index]);
+      },
+    };
+  }, [corpus]);
 };
 
 const SuggestionButton = styled.button`
@@ -83,7 +82,7 @@ const useNoOptionsMessage = (
   return useMemo(
     () =>
       ({ inputValue }: { inputValue: string }) => {
-        const len = inputValue.length;
+        const len = inputValue.trim().length;
         const randomSuggestion =
           corpus[Math.floor(Math.random() * corpus.length)];
 
