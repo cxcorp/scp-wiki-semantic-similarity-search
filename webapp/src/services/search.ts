@@ -207,7 +207,7 @@ export const createScpMatcher = (
       seenIndices.add(match.index);
     }
 
-    return results.slice(0, MAX_RESULTS_PER_METHOD);
+    return results.slice(0, maxResults);
   };
 
   return {
