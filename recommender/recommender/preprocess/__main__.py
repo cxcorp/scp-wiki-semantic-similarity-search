@@ -4,13 +4,14 @@ import sqlite3
 from glob import glob
 import sys
 import os
-from bs4 import BeautifulSoup
 from tqdm import tqdm
 import multiprocessing as mp
 from multiprocessing.pool import Pool
 import orjson
 
 from recommender.common.constants import WIKI_REPO_JSONS_PATH, DB_PATH
+from recommender.preprocess.content_cleaner import cleanup_html_to_text
+from recommender.preprocess.tags import tag_allowlist, tag_to_category
 
 
 def get_content_json_paths() -> Iterable[str]:
@@ -34,7 +35,7 @@ def db_create_tables(con: sqlite3.Connection):
     cur = con.cursor()
     cur.executescript(
         """
-            CREATE TABLE pages(
+            CREATE TABLE IF NOT EXISTS pages(
                 link        TEXT PRIMARY KEY,
                 title       TEXT NOT NULL,
                 url         TEXT NOT NULL,
@@ -44,133 +45,29 @@ def db_create_tables(con: sqlite3.Connection):
                 -- references
             );
 
-            CREATE TABLE hubs(
+            CREATE TABLE IF NOT EXISTS tags(
+                tag TEXT PRIMARY KEY,
+                category TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS tags_pages(
+                page_link TEXT NOT NULL,
+                tag TEXT NOT NULL,
+                PRIMARY KEY(page_link, tag)
+            );
+
+            CREATE TABLE IF NOT EXISTS hubs(
                 link        TEXT PRIMARY KEY
             );
 
-            CREATE TABLE hubs_pages(
+            CREATE TABLE IF NOT EXISTS hubs_pages(
                 page_link   TEXT NOT NULL,
-                hub_link    TEXT NOT NULL
+                hub_link    TEXT NOT NULL,
+                PRIMARY KEY(page_link, hub_link)
             );
             """
     )
     con.commit()
-
-
-# Components for metadata (https://scp-wiki.wikidot.com/components-hub)
-wiki_metadata_components_selectors = [
-    # Info Rating Module
-    ".page-rate-widget-box",
-    # Advanced Navigation Toolbar (ANT)
-    # this one uses same classname (.cell-container) as some actual
-    # page content components, so we need to check for specific children
-    ".cell-container:has(> div.normal):has(> div.end):has(> div.main-text-cell):has(> div.normal.small)",
-    # ACS
-    # remove the danger diamond from the anomaly classification system banner (https://scp-wiki.wikidot.com/classification-committee-memo)
-    # as it contains invisible text
-    ".anom-bar .diamond-part",
-    ".anom-bar .level",
-    # Audio player woed
-    "div.player-wrapper",
-    # Author link
-    "div.authorlink-wrapper",
-    # Document Transcript Swapper
-    ".document-swapper .docbox-selector",
-    # ID Cards
-    ".foundation-id-card .expire",
-    ".foundation-id-card .barcode",
-    # Info Rating Module
-    ".creditRate",
-    # Passcode
-    "#logic",
-    # Ratio bar
-    ".rate_t3",
-    # Wikimodule
-    ".collection:has(> .collapsible-block)",
-    # Adult warning
-    "#u-adult-warning",
-]
-
-unwanted_element_selectors = [
-    ".footnotes",
-    ".footnotes-footer",
-    ".licensebox",
-    ".pseudocrumbs",
-    ".modal-wrapper",
-    *wiki_metadata_components_selectors,
-    ".footer-wikiwalk-nav",
-    # some GOI pages have a hidden element that shows the page source
-    'div[style]:has(> div[style] > div.collapsible-block > div.collapsible-block-folded > a.collapsible-block-link:-soup-contains("+\u00A0CODE"))',
-    # https://scp-wiki.wikidot.com/component:info-ayers
-    ".info-container",
-    ".collapsible-block-link",
-    "div.code > .hl-main",
-]
-
-
-def remove_unwanted_elements(soup: BeautifulSoup):
-    unwanted = []
-
-    for selector in unwanted_element_selectors:
-        matches = list(soup.css.select(selector))
-        unwanted += matches
-        pass
-
-    for el in unwanted:
-        if el is not None and not el.decomposed:
-            el.decompose()
-
-
-def remove_excessive_newlines_and_spaces(text: str) -> str:
-    # replace whitespace characters with single space, collapse multiple to one
-    text = re.sub(r"[ \t\f\v\u00a0]+", " ", text)
-    # remove lines that contain only whitespace
-    text = re.sub(r"\n[ \t\f\v\u00a0]+\n", "\n", text)
-    # collapse more than 3 sequential newlines to two newlines
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text
-
-
-def remove_excessive_censorship_symbols(text: str) -> str:
-    # █ symbol
-    return re.sub(r"\u2588{4,}", "\u2588\u2588\u2588", text)
-
-
-unwanted_regexes = [
-    r"\nby qntm(\s+Previously\s)?",
-    r"Secondary Class:\n\{\$secondary-class\}\s*",
-]
-
-
-def remove_by_regex(text: str) -> str:
-    for r in unwanted_regexes:
-        text = re.sub(r, "", text)
-    return text
-
-
-def cleanup_html_to_text(html: str) -> str:
-    soup = BeautifulSoup(html, "lxml")
-    remove_unwanted_elements(soup)
-
-    text = soup.get_text()
-    text = remove_by_regex(text)
-    text = remove_excessive_censorship_symbols(text)
-    text = remove_excessive_newlines_and_spaces(text)
-    text = text.strip()
-
-    return text
-
-
-def cleanup_content_json_to_items(item: dict) -> dict:
-    text = cleanup_html_to_text(item["raw_content"])
-    return {
-        "link": item["link"],
-        "title": item["title"],
-        "url": item["url"],
-        "raw_content": item["raw_content"],
-        "raw_source": item["raw_source"],
-        "text": text,
-    }
 
 
 def json_loads(path: str):
@@ -179,14 +76,24 @@ def json_loads(path: str):
     return orjson.loads(json)
 
 
+def cleanp_content_mp_task(input):
+    index, raw_content = input
+    return (index, cleanup_html_to_text(raw_content))
+
+
 def parse_and_cleanup_content_from_json(
     pool: Pool, json_values: list[dict], tqdm_description: str | None
-) -> Iterable[dict]:
-    result = pool.imap_unordered(
-        cleanup_content_json_to_items, json_values, chunksize=16
+):
+    results = pool.imap_unordered(
+        cleanp_content_mp_task,
+        ((i, item["raw_content"]) for i, item in enumerate(json_values)),
+        chunksize=16,
     )
-    return tqdm(result, total=len(json_values), desc=tqdm_description, position=0)
-    # return (cleanup_content_json_to_items(x) for x in json_loads(path).values())
+    for i, text in tqdm(
+        results, total=len(json_values), desc=tqdm_description, position=0
+    ):
+        json_values[i]["text"] = text
+    # return (cleanup_content_json_to_items(x) for x in json_values)
 
 
 def item_dict_to_sqlite_tuple(item: dict):
@@ -206,12 +113,10 @@ def parse_and_insert_page_content(
     json_values: list[dict],
     tqdm_description: str | None = None,
 ):
-    params = [
-        item_dict_to_sqlite_tuple(item)
-        for item in parse_and_cleanup_content_from_json(
-            pool, json_values, tqdm_description=tqdm_description
-        )
-    ]
+    parse_and_cleanup_content_from_json(
+        pool, json_values, tqdm_description=tqdm_description
+    )
+    params = [item_dict_to_sqlite_tuple(item) for item in json_values]
     con.executemany(
         "INSERT INTO pages (link, title, url, raw_content, raw_source, text) VALUES (?,?,?,?,?,?)",
         params,
@@ -230,21 +135,22 @@ ignored_hub_links = set(
         "curated-tale-series",
         "event-featured-archive",
         "featured-goi-format-archive",
-        "featured-scp-archive",
         "featured-scp-archive-ii",
-        "featured-tale-archive",
+        "featured-scp-archive",
         "featured-tale-archive-ii",
+        "featured-tale-archive",
         "foundation-tales-audio-edition",
         "foundation-tales",
         "goi-formats",
         "lowest-rated-articles",
-        "news",
         "new-pages-feed",
-        "reviewers-spotlight-archive",
+        "news",
         "reviewers-spotlight-archive-ii",
+        "reviewers-spotlight-archive",
         "scp-international",
         "scp-series",
         "shortest-pages-by-month",
+        "tf-alpha-440",
         "top-rated-goi-formats",
         "top-rated-pages-by-month",
         "top-rated-pages-by-year",
@@ -254,11 +160,25 @@ ignored_hub_links = set(
         "young-and-under-30",
         # non-story hubs
         "art-exchange",
+        "reading-and-writing-club",
         # podcasts
-        "kaktuskast-hub",
-        "simply-creative-people-hub",
+        "advent-calendar-2015",
+        "advent-calendar-2017",
+        "author-s-corner-podcast-hub",
         "discovering-scp-hub",
+        "fam-radio-season-02",
+        "findusalivehub",
+        "kaktuskast-hub",
+        "object-class-podcast",
+        "randomini-does-the-mouth-word-things",
+        "scp-cafe-hub",
+        "scp-play-podcast-hub",
+        "simply-creative-people-hub",
         "the-scip-squad-podcast-hub",
+        "theresacactusinthecorner",
+        "tpias-hub",
+        "ttrimmd",
+        "wttf-podcast-hub",
     ]
 )
 ignored_hub_regexes = [
@@ -269,6 +189,7 @@ ignored_hub_regexes = [
         r"scp-series-\d+-audio-edition",
         r"scp-series-\d+-tales-edition",
         r"tales-by-date-\d+",
+        r"advent-calendar-\d+",
     ]
 ]
 
@@ -295,6 +216,35 @@ def parse_and_insert_page_hub_links(con: sqlite3.Connection, json_values: list[d
     con.executemany(
         "INSERT INTO hubs_pages (page_link, hub_link) VALUES (?, ?)", params
     )
+    con.executemany(
+        "INSERT INTO hubs (link) VALUES (?) ON CONFLICT DO NOTHING",
+        [(p[1],) for p in params],
+    )
+
+
+def is_tag_allowed(tag: str):
+    return tag in tag_allowlist
+
+
+def insert_page_tags(con: sqlite3.Connection, json_values: list[dict]):
+    params = [
+        (v["link"], tag)
+        for v in json_values
+        for tag in v["tags"]
+        if is_tag_allowed(tag)
+    ]
+    con.executemany("INSERT INTO tags_pages (page_link, tag) VALUES (?, ?)", params)
+
+    uniq_tags = list(
+        set(tag for v in json_values for tag in v["tags"] if is_tag_allowed(tag))
+    )
+    tags_with_descriptions = [
+        (tag, tag_to_category.get(tag)) for tag in uniq_tags if tag in tag_to_category
+    ]
+    con.executemany(
+        "INSERT INTO tags(tag, category) VALUES (?, ?) ON CONFLICT DO NOTHING",
+        tags_with_descriptions,
+    )
 
 
 def read_content_to_db(con: sqlite3.Connection, pool: Pool, path: str):
@@ -303,21 +253,32 @@ def read_content_to_db(con: sqlite3.Connection, pool: Pool, path: str):
         con, pool, json_values, tqdm_description=os.path.basename(path)
     )
     parse_and_insert_page_hub_links(con, json_values)
+    insert_page_tags(con, json_values)
 
 
 def main():
     con = sqlite3.connect(DB_PATH, autocommit=False)
 
-    with con:
-        con.execute("DELETE FROM hubs_pages")
-
     with con, mp.Pool(16) as pool:
-        # db_create_tables(con)
+        db_create_tables(con)
 
         paths = list(get_content_json_paths())
 
         for path in tqdm(paths, total=len(paths), position=1):
             read_content_to_db(con, pool, path)
+
+    with con:
+        con.executescript(
+            """
+            CREATE INDEX IF NOT EXISTS pages_link_idx ON pages(link);
+            CREATE INDEX IF NOT EXISTS hubs_link_idx ON hubs(link);
+            CREATE INDEX IF NOT EXISTS hubs_pages_page_link ON hubs_pages(page_link);
+            CREATE INDEX IF NOT EXISTS hubs_pages_hub_link ON hubs_pages(hub_link);
+            CREATE INDEX IF NOT EXISTS tags_pages_tag ON tags_pages(tag);
+            CREATE INDEX IF NOT EXISTS tags_pages_page_link ON tags_pages(page_link);
+            CREATE INDEX IF NOT EXISTS tags_tag ON tags(tag);
+            """
+        )
 
     con.close()
 

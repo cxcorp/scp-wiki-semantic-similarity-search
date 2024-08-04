@@ -1,52 +1,13 @@
-import os
-import pickle
 import shutil
 import sqlite3
 import numpy as np
-import pandas as pd
 from sentence_transformers import SentenceTransformer
 import time
 import re
 import torch
 
+from recommender.common.cacher import DummyCacher, Cacher
 from recommender.common.constants import DB_PATH
-
-
-class Cacher:
-    def __init__(self, version_prefix: str, cache_path: str = "./cache"):
-        self.version_prefix = version_prefix
-        os.makedirs(cache_path, exist_ok=True)
-        self.cache_path = cache_path
-
-    def get_file_path(self, filename: str):
-        return os.path.join(self.cache_path, f"{self.version_prefix}-{filename}")
-
-    def _write_pickle(self, filename: str, data):
-        with open(self.get_file_path(filename), "wb") as fp:
-            pickle.dump(data, fp)
-
-    def write_pages(self, data: list[tuple[str, str]]):
-        self._write_pickle("pages-cache.pickle", data)
-
-    def write_embeddings(self, data: np.ndarray):
-        self._write_pickle("embeddings-cache.pickle", data)
-
-    def write_similarities(self, data: np.ndarray):
-        self._write_pickle("similarities-np-cache.pickle", data)
-
-
-class DummyCacher(Cacher):
-    def __init__(self, version_prefix: str, cache_path: str = "./cache"):
-        super(Cacher, self).__init__(version_prefix, cache_path=cache_path)
-
-    def write_pages(self, data):
-        pass
-
-    def write_embeddings(self, data):
-        pass
-
-    def write_similarities(self, data):
-        pass
 
 
 write_cache = True
@@ -62,18 +23,33 @@ def main():
     )
 
     # with open("./target_links.txt", "r") as fp:
-    #     target_links = fp.readlines()
+    #     target_links = fp.read().splitlines()
 
     start = time.time()
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
 
         res = cur.execute("SELECT link, text FROM pages WHERE LENGTH(text) > 100")
+        pages = res.fetchall()
         # res = cur.execute(
-        #     f"SELECT link, text FROM pages WHERE link IN ({','.join(['?'] * len(target_links))})",
+        #     f"""
+        #     SELECT link, text FROM pages
+        #     WHERE link IN ({','.join(['?'] * len(target_links))})
+        #     """,
         #     target_links,
         # )
-        pages = res.fetchall()
+        # pages = res.fetchall()
+
+        # res = cur.execute(
+        #     f"""
+        #     SELECT link, text FROM pages
+        #     WHERE LENGTH(text) > 100
+        #         AND link NOT IN ({','.join(['?'] * len(target_links))})
+        #     LIMIT {int(1000-len(target_links))}
+        #     """,
+        #     target_links,
+        # )
+        # pages = pages + res.fetchall()
 
         # res = cur.execute("SELECT link, text FROM pages WHERE link = 'unforgettable-that-s-what-you-are' LIMIT 1")
         # reference = res.fetchone()
@@ -83,15 +59,17 @@ def main():
     # https://sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html
     model = SentenceTransformer(
         # https://huggingface.co/Alibaba-NLP/gte-base-en-v1.5
-        "Alibaba-NLP/gte-base-en-v1.5",
+        # "Alibaba-NLP/gte-base-en-v1.5",
+        # "Alibaba-NLP/gte-large-en-v1.5",
+        "Alibaba-NLP/gte-multilingual-base",
         trust_remote_code=True,
         model_kwargs={
             "torch_dtype": torch.float16,
         },
-        config_kwargs={
-            "unpad_inputs": True,
-            "use_memory_efficient_attention": True,
-        },
+        # config_kwargs={
+        #     "unpad_inputs": True,
+        #     "use_memory_efficient_attention": True,
+        # }
     )
 
     # pages = [reference, *pages]
@@ -124,7 +102,10 @@ def main():
     # smaller size). However, at that point the larger batch sizes have been slowed down so much
     # by the large batch size it's faster to run with a small batch size overall.
     embeddings = model.encode(
-        corpus, batch_size=2, show_progress_bar=True, convert_to_numpy=True
+        corpus,
+        batch_size=2,
+        show_progress_bar=True,
+        convert_to_numpy=True,
     )
     end = time.time()
     print(f"encode {end-start}s")
