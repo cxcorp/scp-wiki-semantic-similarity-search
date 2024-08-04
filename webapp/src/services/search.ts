@@ -24,7 +24,7 @@ interface SearchResult {
 
 export const createScpMatcher = (
   corpus: string[],
-  { topNPerMethod }: { topNPerMethod: number },
+  { maxResults }: { maxResults: number },
 ) => {
   const normalizedCorpus = corpus.map((link) => normalizePunctuation(link));
   const suffixToCorpusIndex: Record<SearchNormalizedString, number> =
@@ -41,6 +41,10 @@ export const createScpMatcher = (
     suffixToCorpusIndex[normalizePunctuation(match)] = i;
   }
 
+  type Matcher = (str: string) => SearchResult[];
+  const MAX_RESULTS_PER_METHOD = 200;
+  const STARTS_WITH_BOOST = 0.3;
+
   /**
    * Matches a search term exactly to the suffix of an "scp-" string.
    * For example, "507" returns "scp-507" and "507-ex-j" matches "scp-507-ex-j".
@@ -56,32 +60,63 @@ export const createScpMatcher = (
     return match ?? str;
   };
 
-  const scpSuffixExactMatch = (searchTerm: string) => {
-    searchTerm = stripScpPrefix(searchTerm);
+  const scpSuffixExactMatch = (rawSearchTerm: string) => {
+    const searchTerm = normalizePunctuation(stripScpPrefix(rawSearchTerm));
 
-    const exactMatch = exactScpMatch(normalizePunctuation(searchTerm));
+    const searchForSub100ScpWithLeadingZero = searchTerm.length < 3;
+    const searchTermWithLeadingZeros = searchTerm.padStart(3, "0");
+
+    const results: SearchResult[] = [];
+
+    let exactMatch = exactScpMatch(searchTerm);
     if (exactMatch !== undefined) {
-      return [{ score: 0, index: exactMatch }];
+      results.push({ score: 0, index: exactMatch });
     }
 
-    return [];
+    if (searchForSub100ScpWithLeadingZero) {
+      exactMatch = exactScpMatch(
+        searchTermWithLeadingZeros as unknown as SearchNormalizedString,
+      );
+      if (exactMatch !== undefined) {
+        results.push({ score: 0.1, index: exactMatch });
+      }
+    }
+
+    return results;
   };
 
   const scpSuffixStartsWithMatch = (searchTerm: string) => {
     searchTerm = stripScpPrefix(searchTerm);
     searchTerm = normalizePunctuation(searchTerm);
 
+    const searchForSub100ScpWithLeadingZero = searchTerm.length < 3;
+    const searchTermWithLeadingZeros = searchTerm.padStart(3, "0");
+
     const results: SearchResult[] = [];
     for (const [key, value] of Object.entries(suffixToCorpusIndex)) {
       if (key.startsWith(searchTerm)) {
         results.push({
-          score: 2 ** (distance(searchTerm, key) / 10),
+          score: 2 ** (distance(searchTerm, key) / 10) - STARTS_WITH_BOOST,
+          index: value,
+        });
+      }
+
+      if (
+        searchForSub100ScpWithLeadingZero &&
+        key.startsWith(searchTermWithLeadingZeros)
+      ) {
+        results.push({
+          score:
+            2 ** (distance(searchTermWithLeadingZeros, key) / 10) -
+            STARTS_WITH_BOOST,
           index: value,
         });
       }
     }
 
-    return results.sort((a, b) => a.score - b.score).slice(0, topNPerMethod);
+    return results
+      .sort((a, b) => a.score - b.score)
+      .slice(0, MAX_RESULTS_PER_METHOD);
   };
 
   const startsWithMatch = (searchTerm: string) => {
@@ -92,13 +127,15 @@ export const createScpMatcher = (
       const link = normalizedCorpus[i];
       if (link.startsWith(searchTerm)) {
         results.push({
-          score: 2 ** (distance(searchTerm, link) / 10),
+          score: 2 ** (distance(searchTerm, link) / 10) - STARTS_WITH_BOOST,
           index: i,
         });
       }
     }
 
-    return results.sort((a, b) => a.score - b.score).slice(0, topNPerMethod);
+    return results
+      .sort((a, b) => a.score - b.score)
+      .slice(0, MAX_RESULTS_PER_METHOD);
   };
 
   const exactMatch = (searchTerm: string) => {
@@ -128,10 +165,10 @@ export const createScpMatcher = (
       }
     }
 
-    return results.sort((a, b) => a.score - b.score).slice(0, topNPerMethod);
+    return results
+      .sort((a, b) => a.score - b.score)
+      .slice(0, MAX_RESULTS_PER_METHOD);
   };
-
-  type Matcher = (str: string) => SearchResult[];
 
   const matchShort: Matcher[] = [
     scpSuffixExactMatch,
@@ -155,6 +192,9 @@ export const createScpMatcher = (
       [],
     );
 
+    // sort by similarity
+    allMatches.sort((a, b) => a.score - b.score);
+
     // Deduplicate matches, preserving the first
     const results: SearchResult[] = [];
     const seenIndices = new Set<number>();
@@ -167,7 +207,7 @@ export const createScpMatcher = (
       seenIndices.add(match.index);
     }
 
-    return results;
+    return results.slice(0, MAX_RESULTS_PER_METHOD);
   };
 
   return {

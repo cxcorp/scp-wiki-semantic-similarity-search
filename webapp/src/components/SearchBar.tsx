@@ -45,7 +45,7 @@ const useItemSearch = () => {
       value: item,
       label: item,
     }));
-    const matcher = createScpMatcher(corpus, { topNPerMethod: 5 });
+    const matcher = createScpMatcher(corpus, { maxResults: 25 });
 
     // this is async without need for a purpose - so that it works with react-select's fetcher thing
     return {
