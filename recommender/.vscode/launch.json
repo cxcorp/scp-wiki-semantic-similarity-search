@@ -17,10 +17,10 @@
       "module": "recommender.gen_hubs_sqlite"
     },
     {
-      "name": "gen_preprocess",
+      "name": "gen_recommend",
       "type": "debugpy",
       "request": "launch",
-      "module": "recommender.gen_preprocess"
+      "module": "recommender.gen_recommend"
     },
     {
       "name": "topic",
